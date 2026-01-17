@@ -1,0 +1,17 @@
+{
+  "name": "Velonics Bore Controller",
+  "short_name": "Velonics",
+  "description": "Control your motors easily using the Velonics Motor Controller web app.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#24243e",
+  "theme_color": "#302b63",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
