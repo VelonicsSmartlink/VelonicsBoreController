@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Velonics Bore Controller</title>
-  
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
-  
+
   <!-- MQTT.js -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-  
+
   <!-- Link to the manifest -->
   <link rel="manifest" href="manifest.json">
-  
+
   <style>
     body {
       display: flex;
@@ -22,17 +23,20 @@
       padding: 20px;
       margin: 0;
       font-family: 'Inter', sans-serif;
-      font-size: 18px; /* Increased font size */
+      font-size: 18px;
+      /* Increased font size */
       color: white;
       background: linear-gradient(135deg, #3a7d2c 0%, #145214 100%);
       overflow-y: auto;
     }
+
     h1 {
       font-size: 2rem;
       text-align: center;
       text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
       margin-bottom: 20px;
     }
+
     /* Container that groups motor information and controls */
     .MotorContainer {
       background: rgba(255, 255, 255, 0.1);
@@ -45,29 +49,35 @@
       text-align: center;
       margin-bottom: 20px;
     }
+
     .MotorContainer h2 {
       margin: 0 0 10px;
       padding-bottom: 5px;
     }
+
     .MotorContainer hr {
       border: none;
       border-bottom: 1px solid rgba(255, 255, 255, 0.5);
       margin: 10px 0;
     }
+
     .data p {
       margin: 5px 0;
     }
+
     .controls {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
+
     .controls .row {
       display: flex;
       width: 100%;
       justify-content: space-between;
       align-items: center;
     }
+
     /* For the off time input row */
     .controls input {
       padding: 10px;
@@ -78,6 +88,7 @@
       margin-right: 10px;
       font-size: inherit;
     }
+
     .controls button {
       padding: 10px 20px;
       border: none;
@@ -86,10 +97,12 @@
       font-weight: 600;
       font-size: inherit;
     }
+
     /* Add extra spacing between the Set & Run-R buttons in the first row */
     .controls .row:first-child button:nth-of-type(2) {
       margin-left: 10px;
     }
+
     /* Circular buttons for ON and OFF */
     .circle {
       border-radius: 50%;
@@ -101,14 +114,35 @@
       font-size: 1rem;
       padding: 0;
     }
-    #RedBtn_0, #RedBtn_1, #RedBtn_2, #RedBtn_3, #RedBtn_4, #RedBtn_5, #RedBtn_6, #RedBtn_7, #RedBtn_8, #RedBtn_9 {
+
+    #RedBtn_0,
+    #RedBtn_1,
+    #RedBtn_2,
+    #RedBtn_3,
+    #RedBtn_4,
+    #RedBtn_5,
+    #RedBtn_6,
+    #RedBtn_7,
+    #RedBtn_8,
+    #RedBtn_9 {
       background-color: red;
       color: white;
     }
-    #GreenBtn_0, #GreenBtn_1, #GreenBtn_2, #GreenBtn_3, #GreenBtn_4, #GreenBtn_5, #GreenBtn_6, #GreenBtn_7, #GreenBtn_8, #GreenBtn_9 {
+
+    #GreenBtn_0,
+    #GreenBtn_1,
+    #GreenBtn_2,
+    #GreenBtn_3,
+    #GreenBtn_4,
+    #GreenBtn_5,
+    #GreenBtn_6,
+    #GreenBtn_7,
+    #GreenBtn_8,
+    #GreenBtn_9 {
       background-color: green;
       color: white;
     }
+
     /* Style for the status circle appended to Run_Status text */
     .status-circle {
       display: inline-block;
@@ -117,28 +151,34 @@
       border-radius: 50%;
       margin-left: 5px;
     }
+
     .controls .row.buttons {
       justify-content: center;
       gap: 10px;
     }
+
     .phase-btn-3ph {
       background: blue !important;
       color: white;
     }
+
     .phase-btn-2ph {
       background: yellow !important;
       color: white;
     }
   </style>
 </head>
+
 <body>
-  <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 40px; margin-bottom: 20px;">
+  <div
+    style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 40px; margin-bottom: 20px;">
     <h1 style="margin-bottom: 0;">
       Velonics Bore Controller
     </h1>
   </div>
 
-  <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 40px; margin-bottom: 20px;">
+  <div
+    style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 40px; margin-bottom: 20px;">
     <h1 style="margin-bottom: 0;">
       Home
       <span id="heartbeatIndicator" class="status-circle" style="background: red;"></span>
@@ -147,10 +187,10 @@
       Kumarai
       <span id="heartbeatIndicatorKumarai" class="status-circle" style="background: red;"></span>
     </h1>
-  </div>  
-  
+  </div>
+
   <!-- Removed Home/West/SP Well Motors per request -->
-  
+
   <!-- SP Vadaku Bore -->
   <div class="MotorContainer" data-motor="3">
     <h2 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
@@ -177,11 +217,11 @@
         <button id="GreenBtn_3" class="circle">ON</button>
         <button id="RedBtn_3" class="circle">OFF</button>
         <button id="PhaseBtn_3" class="circle">PH</button>
-        <button id="StatusBtn_3"class="circle">GET</button>
+        <button id="StatusBtn_3" class="circle">GET</button>
       </div>
     </div>
   </div>
-  
+
   <!-- SP Nadu Bore -->
   <div class="MotorContainer" data-motor="4">
     <h2 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
@@ -208,7 +248,7 @@
         <button id="GreenBtn_4" class="circle">ON</button>
         <button id="RedBtn_4" class="circle">OFF</button>
         <button id="PhaseBtn_4" class="circle">PH</button>
-        <button id="StatusBtn_4"class="circle">GET</button>
+        <button id="StatusBtn_4" class="circle">GET</button>
       </div>
     </div>
   </div>
@@ -239,7 +279,7 @@
         <button id="GreenBtn_5" class="circle">ON</button>
         <button id="RedBtn_5" class="circle">OFF</button>
         <button id="PhaseBtn_5" class="circle">PH</button>
-        <button id="StatusBtn_5"class="circle">GET</button>
+        <button id="StatusBtn_5" class="circle">GET</button>
       </div>
     </div>
   </div>
@@ -270,7 +310,7 @@
         <button id="GreenBtn_6" class="circle">ON</button>
         <button id="RedBtn_6" class="circle">OFF</button>
         <button id="PhaseBtn_6" class="circle">PH</button>
-        <button id="StatusBtn_6"class="circle">GET</button>
+        <button id="StatusBtn_6" class="circle">GET</button>
       </div>
     </div>
   </div>
@@ -301,35 +341,65 @@
         <button id="GreenBtn_7" class="circle">ON</button>
         <button id="RedBtn_7" class="circle">OFF</button>
         <button id="PhaseBtn_7" class="circle">PH</button>
-        <button id="StatusBtn_7"class="circle">GET</button>
+        <button id="StatusBtn_7" class="circle">GET</button>
       </div>
     </div>
   </div>
 
   <!-- Removed Kumarai Well Motor (motor 8) per request -->
-  <!-- Removed Kumarai Aux (motor 9) per request -->
+
+  <!-- Home Bore -->
+  <div class="MotorContainer" data-motor="9">
+    <h2 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+      <span class="circle" style="background: #00bcd4; color: white;">-</span>
+      Home Bore
+    </h2>
+    <hr>
+    <div class="data">
+      <p>Status: <span id="RunStatus_9">--</span></p>
+      <p>RunTime: <span id="RunTime_9">--</span></p>
+      <p>OffTime_Rem: <span id="OffTimeRem_9">--</span></p>
+      <p>OffTime_Set: <span id="OffTimeSet_9">--</span></p>
+      <hr>
+      <p id="LastUpdated_9">Last Updated On: 0 Sec ago</p>
+      <hr>
+    </div>
+    <div class="controls">
+      <div class="row">
+        <input type="number" id="OffTimeInput_9" placeholder="Enter Off Time" />
+        <button id="SetOffTimeBtn_9">SET</button>
+        <button id="ResetRunBtn_9">RES</button>
+      </div>
+      <div class="row buttons">
+        <button id="GreenBtn_9" class="circle">ON</button>
+        <button id="RedBtn_9" class="circle">OFF</button>
+        <button id="PhaseBtn_9" class="circle">PH</button>
+        <button id="StatusBtn_9" class="circle">GET</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Service Worker Registration Script -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
+      window.addEventListener('load', function () {
         navigator.serviceWorker.register('/service-worker.js')
-          .then(function(registration) {
+          .then(function (registration) {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log('ServiceWorker registration failed: ', error);
           });
       });
     }
   </script>
-  
+
   <!-- Main Application Script -->
   <script>
     // Device ID constants
     const DEVICE_ID_HOME = '2501006';
     const DEVICE_ID_KUMARAI = 'KUMARAI';
-    
+
     // Helper function to set fields to "Loading..." for a given motor panel.
     function showLoading(motorNumber) {
       document.getElementById('RunStatus_' + motorNumber).innerText = "Loading...";
@@ -355,22 +425,22 @@
       protocol: 'wss'
     };
     const broker = 'wss://t634befc.ala.us-east-1.emqxsl.com:8084/mqtt';
-    
+
     // Connect to the MQTT broker
     const client = mqtt.connect(broker, options);
-    
+
     client.on('connect', () => {
       console.log('Connected to MQTT broker');
       // Subscribe to all motor status topics using a wildcard for motor number
       client.subscribe(`VELONICS/SL/PUB/TWGW/${DEVICE_ID_HOME}/+/Status`);
       // Subscribe to the heartbeat topic
       client.subscribe(`VELONICS/SL/PUB/TWGW/${DEVICE_ID_HOME}/HB`);
-      
+
       // Send the initial heartbeat message
       client.publish(`VELONICS/SL/SUB/TWGW/${DEVICE_ID_HOME}/255/HB`, '0');
       console.log(`Published initial heartbeat message on topic VELONICS/SL/SUB/TWGW/${DEVICE_ID_HOME}/255/HB with value 0`);
     });
-    
+
     // When a message is received, update the appropriate panel.
     client.on('message', (topic, message) => {
       // Check if the message is from the heartbeat topic.
@@ -379,7 +449,7 @@
         document.getElementById('heartbeatIndicator').style.background = "green";
         return; // Do not process further.
       }
-      
+
       try {
         const data = JSON.parse(message.toString());
         const parts = topic.split('/');
@@ -420,7 +490,7 @@
         } else {
           RunStatus_El.innerText = data.RS;
         }
-        
+
         // Update RT (append " Min" if valid)
         let RunTime_Value = data.RT;
         if (RunTime_Value !== "--" && RunTime_Value !== "") {
@@ -434,14 +504,14 @@
           OffTimeSet_Value += " Min";
         }
         document.getElementById('OffTimeSet_' + motorNumber).innerText = OffTimeSet_Value;
-        
+
         // Update OR (append " Min" if valid)
         let OffTimeRem_Value = data.OR;
         if (OffTimeRem_Value !== "--" && OffTimeRem_Value !== "") {
           OffTimeRem_Value += " Min";
         }
         document.getElementById('OffTimeRem_' + motorNumber).innerText = OffTimeRem_Value;
-        
+
         // Update phase button state based on CFG value
         const PhaseBtn = document.getElementById('PhaseBtn_' + motorNumber);
         if (PhaseBtn) {
@@ -458,7 +528,7 @@
             PhaseBtn.className = 'circle';
           }
         }
-        
+
         // Update font color based on X value
         // Update container font color (reuse existing motorContainer)
         if (data.X === "0" || data.X === 0) {
@@ -473,9 +543,9 @@
         console.error('Error parsing motor data:', error);
       }
     });
-    
-    // Attach event listeners for each motor panel (motors 3 to 7)
-    for (const i of [3,4,5,6,7]) {
+
+    // Attach event listeners for each motor panel (motors 3 to 7 and 9)
+    for (const i of [3, 4, 5, 6, 7, 9]) {
       const setBtn = document.getElementById('SetOffTimeBtn_' + i);
       if (setBtn) {
         setBtn.addEventListener('click', () => {
@@ -535,10 +605,10 @@
         });
       }
     }
-    
+
     // Update the "Last Updated On:" text for each motor every second.
     setInterval(() => {
-      for (const i of [3,4,5,6,7]) {
+      for (const i of [3, 4, 5, 6, 7, 9]) {
         const LastUpdated_El = document.getElementById('LastUpdated_' + i);
         // Only update if we have a recorded update time for this motor
         if (LastUpdated_El && lastUpdateTimes[i]) {
@@ -680,4 +750,5 @@
     // Removed all Kumarai Aux (motor 9) event listeners and intervals per request
   </script>
 </body>
+
 </html>
