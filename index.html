@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
 
   <!-- MQTT.js -->
-  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mqtt@5.15.2/dist/mqtt.min.js"></script>
 
   <!-- Link to the manifest -->
   <link rel="manifest" href="manifest.json">
@@ -383,7 +383,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/service-worker.js')
+        navigator.serviceWorker.register('service-worker.js')
           .then(function (registration) {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
           })
@@ -439,6 +439,22 @@
       // Send the initial heartbeat message
       client.publish(`VELONICS/SL/SUB/TWGW/${DEVICE_ID_HOME}/255/HB`, '0');
       console.log(`Published initial heartbeat message on topic VELONICS/SL/SUB/TWGW/${DEVICE_ID_HOME}/255/HB with value 0`);
+    });
+
+    client.on('error', (err) => {
+      console.error('MQTT (Home) connection error:', err);
+      document.getElementById('heartbeatIndicator').style.background = "red";
+    });
+    client.on('close', () => {
+      console.warn('MQTT (Home) connection closed');
+      document.getElementById('heartbeatIndicator').style.background = "red";
+    });
+    client.on('offline', () => {
+      console.warn('MQTT (Home) client offline');
+      document.getElementById('heartbeatIndicator').style.background = "red";
+    });
+    client.on('reconnect', () => {
+      console.log('MQTT (Home) attempting to reconnect...');
     });
 
     // When a message is received, update the appropriate panel.
@@ -651,6 +667,22 @@
       clientKumarai.subscribe(`VELONICS/SL/PUB/TWGW/${DEVICE_ID_KUMARAI}/HB`);
       clientKumarai.publish(`VELONICS/SL/SUB/TWGW/${DEVICE_ID_KUMARAI}/255/HB`, '0');
       console.log(`Published initial heartbeat message on topic VELONICS/SL/SUB/TWGW/${DEVICE_ID_KUMARAI}/255/HB with value 0`);
+    });
+
+    clientKumarai.on('error', (err) => {
+      console.error('MQTT (Kumarai) connection error:', err);
+      document.getElementById('heartbeatIndicatorKumarai').style.background = "red";
+    });
+    clientKumarai.on('close', () => {
+      console.warn('MQTT (Kumarai) connection closed');
+      document.getElementById('heartbeatIndicatorKumarai').style.background = "red";
+    });
+    clientKumarai.on('offline', () => {
+      console.warn('MQTT (Kumarai) client offline');
+      document.getElementById('heartbeatIndicatorKumarai').style.background = "red";
+    });
+    clientKumarai.on('reconnect', () => {
+      console.log('MQTT (Kumarai) attempting to reconnect...');
     });
 
     clientKumarai.on('message', (topic, message) => {

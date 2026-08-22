@@ -1,13 +1,14 @@
-const CACHE_NAME = 'velonics-cache-v1';
+const CACHE_NAME = 'velonics-cache-v2';
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/icon-192x192.png",
-  "/icon-512x512.png",
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icon-512x512.png",
 ];
 
 self.addEventListener('install', event => {
+  // Activate this version immediately instead of waiting for all tabs to close.
+  self.skipWaiting();
   // Cache all defined assets during the install step.
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,6 +20,8 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
+  // Take control of any already-open tabs right away.
+  event.waitUntil(clients.claim());
   // Clean up old caches.
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -31,29 +34,19 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Serve cached assets when available; otherwise fetch from the network.
+  // Network-first: always try to fetch the latest version so app updates
+  // (e.g. index.html) reach the installed PWA. Fall back to cache when offline.
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached response if found.
-        if (response) {
-          return response;
-        }
-        // Otherwise, fetch from network.
-        const fetchRequest = event.request.clone();
-        return fetch(fetchRequest).then(networkResponse => {
-          // Check if the response is valid.
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
-          }
-          // Cache the network response.
+    fetch(event.request)
+      .then(networkResponse => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          return networkResponse;
-        });
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
       })
+      .catch(() => caches.match(event.request))
   );
 });
